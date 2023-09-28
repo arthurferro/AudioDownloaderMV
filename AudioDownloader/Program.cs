@@ -52,7 +52,7 @@ void ShowMenu()
             ShowMenu();
         }
     }
-    catch (Exception error)
+    catch
     {
         Console.Clear();
         Console.WriteLine("Invalid option.");
