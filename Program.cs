@@ -1,8 +1,7 @@
 ﻿using HtmlAgilityPack;
-using System.Net;
 
 List<string> links = new();
-string path = @"C:\tmp\";
+string path = @"C:\Users\SoulRullex\AppData\Local\Temp\MV";
 
 Dictionary<int, string> options = new()
     {
@@ -37,7 +36,7 @@ void ShowMenu()
                 catch (Exception error)
                 {
                     Console.Clear();
-                    Console.WriteLine($"Download error. \nMessage: {error.Message}\nStacktrace: {error.StackTrace}");
+                    Console.Write($"Download error. \nMessage: {error.Message}\nStacktrace: {error.StackTrace}");
                     Thread.Sleep(TimeSpan.FromSeconds(3));
                     ShowMenu();
                 }
@@ -55,7 +54,7 @@ void ShowMenu()
     catch
     {
         Console.Clear();
-        Console.WriteLine("Invalid option.");
+        Console.Write("Invalid option.");
         Thread.Sleep(TimeSpan.FromSeconds(3));
         ShowMenu();
     }
@@ -70,8 +69,8 @@ async Task SearchAudios(string url)
         {
             using (HttpContent content = response.Content)
             {
-                string result = await content.ReadAsStringAsync();
-                HtmlDocument doc = new();
+                var result = await content.ReadAsStringAsync();
+                var doc = new HtmlDocument();
                 doc.LoadHtml(result);
                 var audioTags = doc.DocumentNode.Descendants("audio").ToList();
                 foreach (var audioTag in audioTags)
@@ -83,13 +82,16 @@ async Task SearchAudios(string url)
         }
     }
 
-    using (WebClient client = new())
+    using (var client = new HttpClient())
     {
+        Directory.CreateDirectory(path);
         foreach (var link in links)
         {
-            Uri uri = new Uri(link);
+            var uri = new Uri(link);
             var fileName = uri.Segments.Last();
-            client.DownloadFile(link, (path + fileName));
+            var responseStream = await client.GetStreamAsync(link);
+            using var fileStream = new FileStream(path + "\\" + fileName, FileMode.Create);
+            responseStream.CopyTo(fileStream);
         }
     }
 }
