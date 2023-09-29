@@ -9,8 +9,6 @@ var options = new Dictionary<int, string>()
         {2,"Exit"}
     };
 
-var teste = "teste";
-
 void ShowMenu()
 {
     Console.Clear();
