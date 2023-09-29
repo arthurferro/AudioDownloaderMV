@@ -1,9 +1,9 @@
 ﻿using HtmlAgilityPack;
 
-List<string> links = new();
-string path = @"C:\Users\SoulRullex\AppData\Local\Temp\MV";
+var links = new List<string>();
+var path = Path.GetTempPath();
 
-Dictionary<int, string> options = new()
+var options = new Dictionary<int, string>()
     {
         {1,"Search Audios"},
         {2,"Exit"}
@@ -12,7 +12,7 @@ Dictionary<int, string> options = new()
 void ShowMenu()
 {
     Console.Clear();
-    Console.WriteLine("---Audio Downloader---");
+    Console.WriteLine("MV Audio Downloader");
     try
     {
         foreach (var option in options)
@@ -37,7 +37,7 @@ void ShowMenu()
                 {
                     Console.Clear();
                     Console.Write($"Download error. \nMessage: {error.Message}\nStacktrace: {error.StackTrace}");
-                    Thread.Sleep(TimeSpan.FromSeconds(3));
+                    Console.ReadKey();
                     ShowMenu();
                 }
             }
@@ -75,7 +75,7 @@ async Task SearchAudios(string url)
                 var audioTags = doc.DocumentNode.Descendants("audio").ToList();
                 foreach (var audioTag in audioTags)
                 {
-                    string linkAudio = audioTag.GetAttributeValue("src", null);
+                    var linkAudio = audioTag.GetAttributeValue("src", null);
                     links.Add(linkAudio);
                 }
             }
@@ -84,13 +84,14 @@ async Task SearchAudios(string url)
 
     using (var client = new HttpClient())
     {
+        path += "MV\\";
         Directory.CreateDirectory(path);
         foreach (var link in links)
         {
             var uri = new Uri(link);
             var fileName = uri.Segments.Last();
             var responseStream = await client.GetStreamAsync(link);
-            using var fileStream = new FileStream(path + "\\" + fileName, FileMode.Create);
+            using var fileStream = new FileStream(path + fileName, FileMode.Create);
             responseStream.CopyTo(fileStream);
         }
     }
