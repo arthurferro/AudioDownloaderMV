@@ -16,7 +16,7 @@ The program uses the HtmlAgilityPack library for HTML parsing. Make sure to inst
 dotnet add package HtmlAgilityPack
 ```
 
-```
+```csharp
 // Initialize the MV Audio Downloader
 using HtmlAgilityPack;
 
