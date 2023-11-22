@@ -15,36 +15,6 @@ The program uses the HtmlAgilityPack library for HTML parsing. Make sure to inst
 ```bash
 dotnet add package HtmlAgilityPack
 ```
-
-```csharp
-// Initialize the MV Audio Downloader
-using HtmlAgilityPack;
-
-var links = new List<string>();
-var path = Path.GetTempPath();
-
-var options = new Dictionary<int, string>()
-{
-{1,"Search Audios"},
-{2,"Exit"}
-};
-
-// Display the main menu and handle user input
-void ShowMenu()
-{
-// ... (Code to display menu and handle user input)
-}
-
-// Search for audio files from a given URL
-async Task SearchAudios(string url)
-{
-// ... (Code to extract audio links from HTML content and download them)
-}
-
-// Start the application by displaying the main menu
-ShowMenu();
-```
-
 Note: Ensure that you have the necessary permissions to write to the specified path for downloading audio files.
 
 Feel free to customize and enhance the program according to your needs!
