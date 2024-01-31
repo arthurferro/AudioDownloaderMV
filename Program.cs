@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System.Diagnostics;
 
 var links = new List<string>();
 var path = Path.GetTempPath();
@@ -25,12 +26,15 @@ void ShowMenu()
         {
             if (selectedOption == 1)
             {
+                links = new List<string>();
+                path = Path.GetTempPath();
                 Console.Clear();
                 Console.Write("Paste URL: ");
                 string url = Console.ReadLine()!;
                 try
                 {
                     SearchAudios(url).GetAwaiter().GetResult();
+                    Process.Start("explorer.exe", path);
                     ShowMenu();
                 }
                 catch (Exception error)
@@ -55,7 +59,7 @@ void ShowMenu()
     {
         Console.Clear();
         Console.Write("Invalid option.");
-        Thread.Sleep(TimeSpan.FromSeconds(3));
+        Task.Delay(TimeSpan.FromSeconds(3)).Wait();
         ShowMenu();
     }
 }
@@ -65,20 +69,16 @@ async Task SearchAudios(string url)
 {
     using (HttpClient client = new())
     {
-        using (HttpResponseMessage response = await client.GetAsync(url))
+        using HttpResponseMessage response = await client.GetAsync(url);
+        using HttpContent content = response.Content;
+        var result = await content.ReadAsStringAsync();
+        var doc = new HtmlDocument();
+        doc.LoadHtml(result);
+        var audioTags = doc.DocumentNode.Descendants("audio").ToList();
+        foreach (var audioTag in audioTags)
         {
-            using (HttpContent content = response.Content)
-            {
-                var result = await content.ReadAsStringAsync();
-                var doc = new HtmlDocument();
-                doc.LoadHtml(result);
-                var audioTags = doc.DocumentNode.Descendants("audio").ToList();
-                foreach (var audioTag in audioTags)
-                {
-                    var linkAudio = audioTag.GetAttributeValue("src", null);
-                    links.Add(linkAudio);
-                }
-            }
+            var linkAudio = audioTag.GetAttributeValue("src", null);
+            links.Add(linkAudio);
         }
     }
 
@@ -92,7 +92,7 @@ async Task SearchAudios(string url)
             var fileName = uri.Segments.Last();
             var responseStream = await client.GetStreamAsync(link);
             using var fileStream = new FileStream(path + fileName, FileMode.Create);
-            responseStream.CopyTo(fileStream);
+            await responseStream.CopyToAsync(fileStream);
         }
     }
 }
