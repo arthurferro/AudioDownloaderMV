@@ -77,7 +77,7 @@ async Task SearchAudios(string url)
         var audioTags = doc.DocumentNode.Descendants("audio").ToList();
         foreach (var audioTag in audioTags)
         {
-            var linkAudio = audioTag.GetAttributeValue("src", null);
+            var linkAudio = audioTag.InnerText;
             links.Add(linkAudio);
         }
     }
